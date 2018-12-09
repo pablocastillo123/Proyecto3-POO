@@ -1,12 +1,10 @@
 package com.pdcg.SistemaAdministrativo;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JTextField;
@@ -14,162 +12,411 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Vector;
+import java.awt.event.ActionEvent;
+import javax.swing.JComboBox;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class WFactura extends JFrame {
-
+	private JFrame frame;
+	private int idFactura = 0;
+	private String encabezado[] = { "Codigo", "Producto", "Precio" };
+	WFactura wClose;
+	private JTextField tfCedula;
+	private JTextField tfDireccion;
+	private JTextField tfTelefono;
+	private JTextField tfFecha;
+	private JTextField tfFactura;
+	private JTextField tfSubtotal;
+	private JTextField tfIVA;
+	private JTextField tfTotal;
 	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
-	private JTextField textField_5;
-	private JTextField textField_6;
-	private JTextField textField_7;
-	private JTextField textField_8;
 	private JTable table;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					WFactura frame = new WFactura();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+	public void wClose(WFactura wClose) {
+		this.wClose = wClose;
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public WFactura() {
+		setTitle("Factura");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 665, 410);
+		setBounds(100, 100, 801, 456);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		
-		JLabel lblDatosDelCliente = new JLabel("Datos del cliente");
-		lblDatosDelCliente.setBounds(30, 11, 86, 14);
-		
+
+		getContentPane().setLayout(null);
+		getContentPane().setLayout(null);
+
+		JLabel lblDatosDelCliente = new JLabel("Datos del Cliente ");
+
 		JLabel lblCedula = new JLabel("Cedula");
-		lblCedula.setBounds(40, 36, 46, 14);
-		
+
+		tfCedula = new JTextField();
+		tfCedula.setColumns(10);
+
 		JLabel lblNombre = new JLabel("Nombre");
-		lblNombre.setBounds(40, 61, 46, 14);
-		
+
 		JLabel lblDireccion = new JLabel("Direccion");
-		lblDireccion.setBounds(40, 89, 46, 14);
-		
+
+		tfDireccion = new JTextField();
+		tfDireccion.setColumns(10);
+
 		JLabel lblTelefono = new JLabel("Telefono");
-		lblTelefono.setBounds(40, 114, 46, 14);
-		
-		textField = new JTextField();
-		textField.setBounds(84, 33, 86, 20);
-		textField.setColumns(10);
-		
-		textField_1 = new JTextField();
-		textField_1.setBounds(84, 61, 86, 20);
-		textField_1.setColumns(10);
-		
-		textField_2 = new JTextField();
-		textField_2.setBounds(84, 86, 86, 20);
-		textField_2.setColumns(10);
-		
-		textField_3 = new JTextField();
-		textField_3.setBounds(84, 114, 86, 20);
-		textField_3.setColumns(10);
-		
-		JLabel lblNumeroDeFactura = new JLabel("Numero de Factura");
-		lblNumeroDeFactura.setBounds(252, 61, 98, 14);
-		
+
+		tfTelefono = new JTextField();
+		tfTelefono.setColumns(10);
+
 		JLabel lblFecha = new JLabel("Fecha");
-		lblFecha.setBounds(313, 36, 37, 14);
-		
-		textField_4 = new JTextField();
-		textField_4.setBounds(360, 58, 86, 20);
-		textField_4.setColumns(10);
-		
-		textField_5 = new JTextField();
-		textField_5.setBounds(360, 33, 86, 20);
-		textField_5.setColumns(10);
-		contentPane.setLayout(null);
-		contentPane.add(lblDatosDelCliente);
-		contentPane.add(lblCedula);
-		contentPane.add(lblNombre);
-		contentPane.add(lblDireccion);
-		contentPane.add(lblTelefono);
-		contentPane.add(textField);
-		contentPane.add(textField_1);
-		contentPane.add(textField_2);
-		contentPane.add(textField_3);
-		contentPane.add(lblNumeroDeFactura);
-		contentPane.add(lblFecha);
-		contentPane.add(textField_4);
-		contentPane.add(textField_5);
-		
+
+		tfFecha = new JTextField();
+		tfFecha.setColumns(10);
+
+		JLabel lblFactura = new JLabel("Factura");
+
+		tfFactura = new JTextField();
+		tfFactura.setColumns(10);
+
+		JLabel lblProducto = new JLabel("Producto");
+
+		JLabel lblVendedor = new JLabel("Vendedor");
+
+		JLabel lblSubtotal = new JLabel("SubTotal:");
+
+		tfSubtotal = new JTextField();
+		tfSubtotal.setColumns(10);
+
+		JLabel lblIva = new JLabel("I.V.A.:");
+
+		tfIVA = new JTextField();
+		tfIVA.setColumns(10);
+
 		JLabel lblTotal = new JLabel("Total");
-		lblTotal.setBounds(473, 36, 46, 14);
-		contentPane.add(lblTotal);
-		
-		JLabel lblIva = new JLabel("I.V.A.");
-		lblIva.setBounds(473, 61, 46, 14);
-		contentPane.add(lblIva);
-		
-		JLabel lblSubtotal = new JLabel("SubTotal");
-		lblSubtotal.setBounds(473, 89, 46, 14);
-		contentPane.add(lblSubtotal);
-		
-		textField_6 = new JTextField();
-		textField_6.setBounds(529, 33, 86, 20);
-		contentPane.add(textField_6);
-		textField_6.setColumns(10);
-		
-		textField_7 = new JTextField();
-		textField_7.setBounds(529, 58, 86, 20);
-		contentPane.add(textField_7);
-		textField_7.setColumns(10);
-		
-		textField_8 = new JTextField();
-		textField_8.setBounds(529, 86, 86, 20);
-		contentPane.add(textField_8);
-		textField_8.setColumns(10);
+
+		tfTotal = new JTextField();
+		tfTotal.setColumns(10);
+
+		JButton btnNewButton = new JButton("Facturar");
+		btnNewButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				crearFactura();
+			}
+		});
+
+		JButton btnSalir = new JButton("Salir");
+		btnSalir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				wClose.setVisible(false);
+
+			}
+		});
+
+		JComboBox cmbProducto = new JComboBox();
+		loadDataProducto(cmbProducto);
+		cmbProducto.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				loadListaCompra(cmbProducto);
+			}
+		});
+
+		JComboBox cmbVendedor = new JComboBox();
+		loadDataVendedor(cmbVendedor);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(23, 160, 592, 142);
-		contentPane.add(scrollPane);
-		
-		table = new JTable();
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Codigo", "Producto", "Descripcion", "Cantidad", "Precio", "Total", "SubTotal"
+
+		JComboBox cmbCliente = new JComboBox();
+		loadDataCliente(cmbCliente);
+		cmbCliente.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
 			}
-		));
+		});
+
+		GroupLayout groupLayout = new GroupLayout(getContentPane());
+		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup().addGap(27)
+						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addGroup(groupLayout
+										.createSequentialGroup()
+										.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 690,
+												GroupLayout.PREFERRED_SIZE)
+										.addContainerGap())
+								.addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout
+										.createParallelGroup(Alignment.LEADING)
+										.addGroup(groupLayout.createSequentialGroup().addGap(9)
+												.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+														.addGroup(groupLayout.createSequentialGroup()
+																.addComponent(lblVendedor).addGap(40)
+																.addComponent(cmbVendedor, GroupLayout.PREFERRED_SIZE,
+																		131, GroupLayout.PREFERRED_SIZE)
+																.addGap(244).addComponent(lblSubtotal))
+														.addGroup(groupLayout.createSequentialGroup().addGap(99)
+																.addComponent(btnNewButton).addGap(18)
+																.addComponent(btnSalir)
+																.addPreferredGap(ComponentPlacement.RELATED, 240,
+																		Short.MAX_VALUE)
+																.addComponent(lblTotal))
+														.addGroup(groupLayout.createSequentialGroup()
+																.addPreferredGap(ComponentPlacement.RELATED, 474,
+																		Short.MAX_VALUE)
+																.addComponent(lblIva)))
+												.addGap(18).addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+														.addComponent(tfSubtotal, GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+														.addComponent(
+																tfIVA, GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+														.addComponent(tfTotal, GroupLayout.PREFERRED_SIZE,
+																GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+										.addGroup(groupLayout.createSequentialGroup()
+												.addComponent(lblDireccion, GroupLayout.PREFERRED_SIZE, 76,
+														GroupLayout.PREFERRED_SIZE)
+												.addGap(63)
+												.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+														.addGroup(groupLayout.createSequentialGroup().addGap(294)
+																.addComponent(lblTelefono, GroupLayout.PREFERRED_SIZE,
+																		63, GroupLayout.PREFERRED_SIZE)
+																.addGap(18).addComponent(tfTelefono,
+																		GroupLayout.PREFERRED_SIZE,
+																		GroupLayout.DEFAULT_SIZE,
+																		GroupLayout.PREFERRED_SIZE))
+														.addGroup(groupLayout.createSequentialGroup().addGap(21)
+																.addComponent(lblProducto, GroupLayout.PREFERRED_SIZE,
+																		60, GroupLayout.PREFERRED_SIZE)
+																.addPreferredGap(ComponentPlacement.RELATED)
+																.addComponent(cmbProducto, GroupLayout.PREFERRED_SIZE,
+																		404, GroupLayout.PREFERRED_SIZE)))
+												.addPreferredGap(
+														ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+														Short.MAX_VALUE))
+										.addGroup(groupLayout.createSequentialGroup().addGroup(groupLayout
+												.createParallelGroup(Alignment.LEADING)
+												.addComponent(lblDatosDelCliente, GroupLayout.PREFERRED_SIZE, 106,
+														GroupLayout.PREFERRED_SIZE)
+												.addGroup(groupLayout.createSequentialGroup()
+														.addComponent(lblCedula, GroupLayout.PREFERRED_SIZE, 46,
+																GroupLayout.PREFERRED_SIZE)
+														.addGap(10)
+														.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+																.addComponent(
+																		tfDireccion, GroupLayout.PREFERRED_SIZE, 263,
+																		GroupLayout.PREFERRED_SIZE)
+																.addGroup(groupLayout.createSequentialGroup()
+																		.addComponent(tfCedula,
+																				GroupLayout.PREFERRED_SIZE,
+																				GroupLayout.DEFAULT_SIZE,
+																				GroupLayout.PREFERRED_SIZE)
+																		.addPreferredGap(ComponentPlacement.RELATED, 27,
+																				Short.MAX_VALUE)
+																		.addComponent(lblNombre,
+																				GroupLayout.PREFERRED_SIZE, 46,
+																				GroupLayout.PREFERRED_SIZE)
+																		.addPreferredGap(ComponentPlacement.RELATED)
+																		.addComponent(cmbCliente,
+																				GroupLayout.PREFERRED_SIZE, 100,
+																				GroupLayout.PREFERRED_SIZE)
+																		.addPreferredGap(ComponentPlacement.RELATED)))))
+												.addGap(18)
+												.addComponent(lblFecha, GroupLayout.PREFERRED_SIZE, 46,
+														GroupLayout.PREFERRED_SIZE)
+												.addPreferredGap(ComponentPlacement.RELATED)
+												.addComponent(tfFecha, GroupLayout.PREFERRED_SIZE,
+														GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+												.addPreferredGap(ComponentPlacement.UNRELATED)
+												.addComponent(lblFactura, GroupLayout.PREFERRED_SIZE, 46,
+														GroupLayout.PREFERRED_SIZE)
+												.addPreferredGap(ComponentPlacement.RELATED)
+												.addComponent(tfFactura, GroupLayout.PREFERRED_SIZE,
+														GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+												.addGap(146)))
+										.addGap(70)))));
+		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
+				.createSequentialGroup().addGap(11).addComponent(lblDatosDelCliente).addGap(
+						11)
+				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(
+								groupLayout.createSequentialGroup().addGap(6).addComponent(lblCedula))
+						.addGroup(
+								groupLayout.createParallelGroup(Alignment.BASELINE)
+										.addComponent(tfCedula, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblNombre).addComponent(lblFecha)
+										.addComponent(tfFecha, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblFactura)
+										.addComponent(tfFactura, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(cmbCliente, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE)))
+				.addGap(11)
+				.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblTelefono)
+								.addComponent(tfTelefono, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+								.addComponent(tfDireccion, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblDireccion)))
+				.addGap(24)
+				.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(lblProducto).addComponent(
+						cmbProducto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addGap(119)
+				.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addGroup(groupLayout.createSequentialGroup().addGap(18)
+								.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+										.addComponent(tfSubtotal, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblSubtotal).addComponent(lblVendedor).addComponent(cmbVendedor,
+												GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE))
+								.addPreferredGap(ComponentPlacement.UNRELATED)
+								.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+										.addComponent(tfIVA, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblIva))
+								.addPreferredGap(ComponentPlacement.UNRELATED)
+								.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+										.addComponent(tfTotal, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+												GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblTotal))
+								.addContainerGap(58, Short.MAX_VALUE))
+						.addGroup(groupLayout.createSequentialGroup().addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(btnNewButton)
+										.addComponent(btnSalir))
+								.addGap(28))))
+				.addGroup(groupLayout.createSequentialGroup().addGap(142)
+						.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
+						.addContainerGap(151, Short.MAX_VALUE)));
+
+		table = new JTable();
+		table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "Codigo", "Producto", "Precio" }));
 		scrollPane.setViewportView(table);
-		
-		JButton btnGuardar = new JButton("Guardar");
-		btnGuardar.setBounds(81, 313, 89, 23);
-		contentPane.add(btnGuardar);
-		
-		JButton btnEliminar = new JButton("Eliminar");
-		btnEliminar.setBounds(180, 313, 89, 23);
-		contentPane.add(btnEliminar);
-		
-		JButton btnLimpiar = new JButton("Limpiar");
-		btnLimpiar.setBounds(279, 313, 89, 23);
-		contentPane.add(btnLimpiar);
-		
-		JButton btnSalir = new JButton("Salir");
-		btnSalir.setBounds(378, 313, 89, 23);
-		contentPane.add(btnSalir);
+		getContentPane().setLayout(groupLayout);
 	}
 
+	public void loadDataProducto(JComboBox cp) {
+		try {
+			Conexion cnn = new Conexion();
+			Statement st = cnn.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = st.executeQuery("SELECT nu_codigo,de_nombre,nu_precio_venta FROM negocio.producto");
+
+			Producto pp = new Producto();
+			cp.addItem(pp);
+			while (rs.next()) {
+				pp = new Producto();
+				pp.setCodigo(rs.getInt("nu_codigo"));
+				pp.setNombre(rs.getString("de_nombre"));
+				pp.setPrecio(rs.getLong("nu_precio_venta"));
+				cp.addItem(pp);
+			}
+			rs.close();
+			st.close();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			JOptionPane.showMessageDialog(null, "Error al consultar", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void loadDataVendedor(JComboBox cp) {
+		try {
+			Conexion cnn = new Conexion();
+			Statement st = cnn.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = st.executeQuery("SELECT de_nombre FROM negocio.vendedor");
+
+			Vendedor vv = new Vendedor();
+			cp.addItem(vv);
+
+			while (rs.next()) {
+				vv = new Vendedor();
+				vv.setNombre(rs.getString("de_nombre"));
+				cp.addItem(vv);
+			}
+			rs.close();
+			st.close();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			JOptionPane.showMessageDialog(null, "Error al consultar", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void loadListaCompra(JComboBox cmbProducto) {
+		Producto pp = (Producto) cmbProducto.getSelectedItem();
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		Vector row = new Vector();
+
+		if (tfSubtotal.getText() == null || tfSubtotal.getText().equals("")) {
+			tfSubtotal.setText("0");
+			tfIVA.setText("0");
+			tfTotal.setText("0");
+		}
+
+		if (pp.getNombre() != null) {
+			row.add(pp.getCodigo());
+			row.add(pp.getNombre());
+			row.add(pp.getPrecio());
+			model.addRow(row);
+			tfSubtotal.setText((Float.parseFloat(tfSubtotal.getText()) + pp.getPrecio()) + "");
+			tfIVA.setText((Float.parseFloat(tfSubtotal.getText()) * 0.16) + "");
+			tfTotal.setText((Float.parseFloat(tfSubtotal.getText()) * 1.16) + "");
+		}
+	}
+
+	public void loadDataCliente(JComboBox cp) {
+		try {
+			Conexion cnn = new Conexion();
+			Statement st = cnn.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = st.executeQuery("SELECT nu_cedula,de_nombre,de_direccion,nu_telefono FROM negocio.cliente");
+
+			Cliente cc = new Cliente();
+			cp.addItem(cc);
+			while (rs.next()) {
+				cc = new Cliente();
+				cc.setCedula(rs.getInt("nu_cedula"));
+				cc.setNombre(rs.getString("de_nombre"));
+				cc.setDireccion(rs.getString("de_direccion"));
+				cc.setTelefono(rs.getString("nu_telefono"));
+
+				cp.addItem(cc);
+			}
+			rs.close();
+			st.close();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			JOptionPane.showMessageDialog(null, "Error al consultar", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void crearFactura() {
+		Conexion cnn = new Conexion();
+		Vendedor vv = new Vendedor();
+		int tfF = Integer.parseInt(tfFactura.getText());
+		float tfT = Float.parseFloat(tfTotal.getText());
+
+		for (int i = 0; i < table.getRowCount(); i++) {
+			System.out.println(table.getValueAt(i, 0));
+			System.out.println(table.getValueAt(i, 1));
+			System.out.println(table.getValueAt(i, 2));
+			System.out.println("----------------------------------------------------------------");
+		//	cnn.ejecutarCambio(cnn,
+			//		"INSERT INTO negocio.factura(id_factura, id_impuesto, nu_factura, nu_total, id_cliente, id_vendedor) VALUES ("+ tfF + "," + 1 + "," + tfF + "," + tfT + "," + +"," + vv.getId() + ")");
+			cnn.ejecutarCambio(cnn,
+					"INSERT INTO negocio.detalle_factura(id_producto, nu_cantidad, nu_precio_venta, id_factura) VALUES (?, 1, ?, ?)");
+
+			// cnn.ejecutarCambio(cnn, "INSERT INTO negocio.vendedor(de_nombre, nu_cedula)"
+			// + "VALUES ('" + tfNombre.getText() + "', " +
+			// Integer.parseInt(tfCedula.getText()) + ")");
+
+		}
+	}
 }

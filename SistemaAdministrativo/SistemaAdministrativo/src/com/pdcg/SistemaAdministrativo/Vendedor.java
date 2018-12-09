@@ -1,29 +1,30 @@
 package com.pdcg.SistemaAdministrativo;
 
 public class Vendedor {
-	public int id;
-	public int cedula;
-	public String nombre;
+	private int id;
+	private String nombre;
 	
+	public Vendedor() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getCedula() {
-		return cedula;
-	}
-	public void setCedula(int cedula) {
-		this.cedula = cedula;
-	}
-	public String getNombre() {
+	
+	public String getNombreV() {
 		return nombre;
 	}
+
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	
-	
 
+	public String toString() {
+	   return nombre;
+   }
 }
