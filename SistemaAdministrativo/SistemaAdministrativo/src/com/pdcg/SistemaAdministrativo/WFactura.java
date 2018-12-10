@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
@@ -26,6 +27,8 @@ import java.awt.event.MouseEvent;
 public class WFactura extends JFrame {
 	private JFrame frame;
 	private int idFactura = 0;
+	private int idCliente=0;
+	private int idVendedor=0;
 	private String encabezado[] = { "Codigo", "Producto", "Precio" };
 	WFactura wClose;
 	private JTextField tfCedula;
@@ -102,13 +105,7 @@ public class WFactura extends JFrame {
 		tfTotal = new JTextField();
 		tfTotal.setColumns(10);
 
-		JButton btnNewButton = new JButton("Facturar");
-		btnNewButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				crearFactura();
-			}
-		});
+	
 
 		JButton btnSalir = new JButton("Salir");
 		btnSalir.addActionListener(new ActionListener() {
@@ -133,10 +130,17 @@ public class WFactura extends JFrame {
 
 		JComboBox cmbCliente = new JComboBox();
 		loadDataCliente(cmbCliente);
-		cmbCliente.addMouseListener(new MouseAdapter() {
+		cmbCliente.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				loadCliente(cmbCliente);
+			}
+		});
+		
+		JButton btnNewButton = new JButton("Facturar");
+		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				
+				crearFactura(cmbCliente,cmbVendedor,cmbProducto);
 			}
 		});
 
@@ -297,22 +301,25 @@ public class WFactura extends JFrame {
 						.addContainerGap(151, Short.MAX_VALUE)));
 
 		table = new JTable();
-		table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "Codigo", "Producto", "Precio" }));
+		table.setModel(new DefaultTableModel(new Object[][] {},	encabezado));
 		scrollPane.setViewportView(table);
 		getContentPane().setLayout(groupLayout);
-	}
+	
+
+}
 
 	public void loadDataProducto(JComboBox cp) {
 		try {
 			Conexion cnn = new Conexion();
 			Statement st = cnn.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 					ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = st.executeQuery("SELECT nu_codigo,de_nombre,nu_precio_venta FROM negocio.producto");
+			ResultSet rs = st.executeQuery("SELECT id_producto,nu_codigo,de_nombre,nu_precio_venta FROM negocio.producto");
 
 			Producto pp = new Producto();
 			cp.addItem(pp);
 			while (rs.next()) {
 				pp = new Producto();
+				pp.setId(rs.getInt("id_producto"));
 				pp.setCodigo(rs.getInt("nu_codigo"));
 				pp.setNombre(rs.getString("de_nombre"));
 				pp.setPrecio(rs.getLong("nu_precio_venta"));
@@ -331,13 +338,14 @@ public class WFactura extends JFrame {
 			Conexion cnn = new Conexion();
 			Statement st = cnn.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 					ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = st.executeQuery("SELECT de_nombre FROM negocio.vendedor");
+			ResultSet rs = st.executeQuery("SELECT id_vendedor,de_nombre FROM negocio.vendedor");
 
 			Vendedor vv = new Vendedor();
 			cp.addItem(vv);
 
 			while (rs.next()) {
 				vv = new Vendedor();
+				vv.setId(rs.getInt("id_vendedor"));
 				vv.setNombre(rs.getString("de_nombre"));
 				cp.addItem(vv);
 			}
@@ -376,12 +384,13 @@ public class WFactura extends JFrame {
 			Conexion cnn = new Conexion();
 			Statement st = cnn.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 					ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = st.executeQuery("SELECT nu_cedula,de_nombre,de_direccion,nu_telefono FROM negocio.cliente");
+			ResultSet rs = st.executeQuery("SELECT id_cliente,nu_cedula,de_nombre,de_direccion,nu_telefono FROM negocio.cliente");
 
 			Cliente cc = new Cliente();
 			cp.addItem(cc);
 			while (rs.next()) {
 				cc = new Cliente();
+				cc.setId(rs.getInt("id_cliente"));
 				cc.setCedula(rs.getInt("nu_cedula"));
 				cc.setNombre(rs.getString("de_nombre"));
 				cc.setDireccion(rs.getString("de_direccion"));
@@ -396,10 +405,22 @@ public class WFactura extends JFrame {
 			JOptionPane.showMessageDialog(null, "Error al consultar", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	
+	private void loadCliente(JComboBox cmbCliente) {
+		Cliente cc = (Cliente) cmbCliente.getSelectedItem();
+		tfCedula.setText(String.valueOf(cc.getCedula()));
+		tfDireccion.setText(cc.getDireccion());
+		tfTelefono.setText(cc.getTelefono());
 
-	private void crearFactura() {
-		Conexion cnn = new Conexion();
-		Vendedor vv = new Vendedor();
+	} 
+
+	private void crearFactura(JComboBox cmbCliente, JComboBox cmbVendedor,JComboBox cmbProducto) {
+		Conexion cnn = new Conexion() ;
+		Conexion cnn1 = new Conexion();
+		Vendedor vv = (Vendedor) cmbVendedor.getSelectedItem();
+		Cliente cc = (Cliente) cmbCliente.getSelectedItem();
+		Producto pp = (Producto) cmbProducto.getSelectedItem();
+		
 		int tfF = Integer.parseInt(tfFactura.getText());
 		float tfT = Float.parseFloat(tfTotal.getText());
 
@@ -408,10 +429,11 @@ public class WFactura extends JFrame {
 			System.out.println(table.getValueAt(i, 1));
 			System.out.println(table.getValueAt(i, 2));
 			System.out.println("----------------------------------------------------------------");
-		//	cnn.ejecutarCambio(cnn,
-			//		"INSERT INTO negocio.factura(id_factura, id_impuesto, nu_factura, nu_total, id_cliente, id_vendedor) VALUES ("+ tfF + "," + 1 + "," + tfF + "," + tfT + "," + +"," + vv.getId() + ")");
-			cnn.ejecutarCambio(cnn,
-					"INSERT INTO negocio.detalle_factura(id_producto, nu_cantidad, nu_precio_venta, id_factura) VALUES (?, 1, ?, ?)");
+			
+			cnn.ejecutarCambio(cnn,"INSERT INTO negocio.factura(id_factura, id_impuesto, nu_factura, nu_total, id_cliente, id_vendedor) "+
+			"VALUES ("+ tfF + "," + 1 + "," + tfF + "," + tfT + "," +cc.getId()+ "," + vv.getId() + ")");
+			cnn1.ejecutarCambio(cnn1,"INSERT INTO negocio.detalle_factura(id_producto, nu_cantidad, nu_precio_venta, id_factura) "+
+			"VALUES ("+pp.getId()+","+ 1 +","+pp.getPrecio() +","+ tfF+")");
 
 			// cnn.ejecutarCambio(cnn, "INSERT INTO negocio.vendedor(de_nombre, nu_cedula)"
 			// + "VALUES ('" + tfNombre.getText() + "', " +

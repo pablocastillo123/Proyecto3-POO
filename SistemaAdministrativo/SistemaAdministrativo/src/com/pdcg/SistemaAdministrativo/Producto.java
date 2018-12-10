@@ -1,10 +1,21 @@
 package com.pdcg.SistemaAdministrativo;
 
 public class Producto {
+	private int id;
 	private long codigo;
 	private String nombre;
 	private float precio;
 
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	
 	public Producto() {
 		codigo = 0;
 		nombre = null;

@@ -5,11 +5,11 @@ import javax.swing.Spring;
 public class Cliente {
 	private int id;
 	private String nombre;
-	private long cedula;
+	private int cedula;
 	private String direccion;
 	private String telefono;
 	
-	public int getId() {
+	public  int getId() {
 		return id;
 	}
 	public void setId(int id) {
@@ -21,10 +21,10 @@ public class Cliente {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public long getCedula() {
+	public int getCedula() {
 		return cedula;
 	}
-	public void setCedula(long cedula) {
+	public void setCedula(int cedula) {
 		this.cedula = cedula;
 	}
 	public String getDireccion() {

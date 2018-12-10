@@ -33,8 +33,7 @@ public class WCliente extends JFrame {
 	private JTextField tfTelefono;
 	private JTable table;
 	private int idCliente = 0;
-	
-	private String titulos[]={"Cedula","Nombre","Direccion","Telefono"};
+	private String encabezado[]={"Id","Cedula","Nombre","Direccion","Telefono"};
 	WCliente wClose;
 
 
@@ -77,59 +76,36 @@ public class WCliente extends JFrame {
 		JButton btnGuardar = new JButton("Guardar");
 		btnGuardar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					if (validarDato()) {
-						Conexion cnn1 = new Conexion();
-						Statement st = cnn1.getConnection().createStatement();
-	
-						
+				if (validarDato()) {
+						Conexion cnn = new Conexion();
 						long cedula = Long.parseLong(tfCedula.getText());
 						String nombre = tfNombre.getText();
 						String direccion = tfDireccion.getText();
 						String telefono = tfTelefono.getText();
 	
 						if (idCliente == 0)
-							st.executeUpdate("INSERT INTO negocio.cliente(nu_cedula,de_nombre,de_direccion,nu_telefono)" + "VALUES ("+cedula+",'"+nombre+"','"+direccion+"','"+telefono+"')");
+							cnn.ejecutarCambio(cnn,"INSERT INTO negocio.cliente(nu_cedula,de_nombre,de_direccion,nu_telefono)" + "VALUES ("+cedula+",'"+nombre+"','"+direccion+"','"+telefono+"')");
 						else 
-							st.executeUpdate("UPDATE negocio.cliente SET nu_cedula = " + cedula + ", de_nombre = '" + nombre+"', de_direccion = '"+direccion+"', nu_telefono = '"+telefono+"' WHERE id = " + idCliente);
-							
-						idCliente = 0;
-						table.setModel(new DefaultTableModel(loadDataTable(),titulos));
+							cnn.ejecutarCambio(cnn,"UPDATE negocio.cliente SET nu_cedula = " + cedula + ", de_nombre = '" + nombre+"', de_direccion = '"+direccion+"', nu_telefono = '"+telefono+"' WHERE id_cliente = " + idCliente);
+						
+						loadDataTable();
 					}
 					else
 						JOptionPane.showMessageDialog(null, "Faltan datos, verfique!", "Sistema", JOptionPane.WARNING_MESSAGE);
-				} 
-				catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} 
-				
 			}
 		});
 		
 		JButton btnEliminar = new JButton("Eliminar");
 		btnEliminar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					Conexion cnn1 = new Conexion();
-					Statement st = cnn1.getConnection().createStatement();
-					st.executeUpdate("DELETE FROM negocio.cliente WHERE id_cliente = " + Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0).toString()));
-					table.setModel(new DefaultTableModel(loadDataTable(), titulos));
-				} catch (NumberFormatException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					Conexion cnn = new Conexion();
+					cnn.ejecutarCambio(cnn,"DELETE FROM negocio.cliente WHERE id_cliente = " + Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0).toString()));
+					loadDataTable();
 				}
-			}
-		});
-		
-
+			});
 		
 		JButton btnSalir = new JButton("Salir");
 		btnSalir.addActionListener(new ActionListener() {
-			
 			public void actionPerformed(ActionEvent e) {
 				wClose.setVisible(false);
 			}
@@ -202,58 +178,53 @@ public class WCliente extends JFrame {
 		);
 		
 		table = new JTable();
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Cedula", "Nombre", "Direccion", "Telefono"
-			}
-		));
+		table.setModel(new DefaultTableModel(new Object[][] {},encabezado));
 		scrollPane.setViewportView(table);
 		contentPane.setLayout(gl_contentPane);
 		
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent arg0) {
-				tfCedula.setText(table.getValueAt(table.getSelectedRow(), 0).toString());
-				tfNombre.setText(table.getValueAt(table.getSelectedRow(), 1).toString());
-				tfDireccion.setText(table.getValueAt(table.getSelectedRow(),2).toString());
-				tfTelefono.setText(table.getValueAt(table.getSelectedRow(),3).toString());
-			}
+				idCliente = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0).toString());
+				tfCedula.setText(table.getValueAt(table.getSelectedRow(), 1).toString());
+				tfNombre.setText(table.getValueAt(table.getSelectedRow(), 2).toString());
+				tfDireccion.setText(table.getValueAt(table.getSelectedRow(),3).toString());
+				tfTelefono.setText(table.getValueAt(table.getSelectedRow(),4).toString());
+				}
 			});
-		
-		table.setModel(new DefaultTableModel(loadDataTable(),titulos));
+		loadDataTable();
 	}
 	
-private String[][] loadDataTable(){
+	private void loadDataTable() {
+		table.setModel(new DefaultTableModel(findDataTable(), encabezado));
+		table.getColumnModel().getColumn(0).setMaxWidth(0);
+		table.getColumnModel().getColumn(0).setMinWidth(0);
+		table.getColumnModel().getColumn(0).setPreferredWidth(0);
+		idCliente = 0;
+		tfCedula.setText("");
+		tfNombre.setText("");
+		tfDireccion.setText("");
+		tfTelefono.setText("");
+	}
+	
+private String[][] findDataTable(){
 	String matrizInfo[][] = new String [0][0];
 	int i = 0;
 	
 	try {
-		table.clearSelection();
 		Conexion cnn = new Conexion();
-		Statement st = cnn.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-		ResultSet rs = st.executeQuery("SELECT id_cliente,nu_cedula,de_nombre,de_direccion,nu_telefono FROM negocio.cliente ORDER BY de_nombre");
-		
-	    int total = 0;
-	    if (rs.last()) { 
-	        total = rs.getRow();
-	    }
-		
-		matrizInfo = new String[total][4];
-        rs.first();
-		if (total > 0) {
+		ResultSet rs = cnn.abrirConsulta(cnn,"SELECT id_cliente , nu_cedula , de_nombre , de_direccion , nu_telefono FROM negocio.cliente ORDER BY de_nombre");
+	    matrizInfo = new String[cnn.totalFilas()][table.getColumnCount()];
+        if (cnn.totalFilas() > 0) {
 	        do {
-			
-				matrizInfo[i][0]=Integer.parseInt(rs.getString("nu_cedula"))+"";
-				matrizInfo[i][1]=rs.getString("de_nombre")+"";
-				matrizInfo[i][2]=rs.getString("de_direccion")+"";
-				matrizInfo[i][3]=rs.getString("nu_telefono")+"";
-
+				matrizInfo[i][0]=Integer.parseInt(rs.getString("id_cliente"))+"";
+				matrizInfo[i][1]=Integer.parseInt(rs.getString("nu_cedula"))+"";
+				matrizInfo[i][2]=rs.getString("de_nombre")+"";
+				matrizInfo[i][3]=rs.getString("de_direccion")+"";
+				matrizInfo[i][4]=rs.getString("nu_telefono")+"";
 				i++;
 			} while (rs.next());
 		}
-		rs.close();
-		st.close();
+        cnn.cerrarConsulta();
 
 	} catch (SQLException e) {
 		System.out.println(e.getMessage());
